@@ -23,7 +23,7 @@ npm install boolean-parser
 ```
 
 ## Usage
-```
+```javascript
 var booleanParser = require('booleanParser');
 
 var searchPhrase = '((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j';
