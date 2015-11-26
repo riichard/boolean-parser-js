@@ -18,7 +18,7 @@
     "parser",
     "lucene"
   ],
-  "author": "Richard Kraaijenhagen",
+  "author": "Richard Kraaijenhagen <stdin@riichard.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/riichard/boolean-parser-js/issues"
