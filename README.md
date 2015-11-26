@@ -9,13 +9,13 @@ Whereas a, b and c represent words, forming a complex query pattern.
 This function works recursively trough all brackets and generates an array of all possible combinations
 of a matching query.
 
-For instance:
+#### For instance:
 
 ```
 ((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j
 ```
 
-Becomes:
+#### Becomes:
 ```
 [[a,b,d,e,f],
  [a,c,d,e,f],
