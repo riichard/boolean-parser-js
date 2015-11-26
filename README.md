@@ -1,4 +1,7 @@
-# boolean-parser-js
+![Travis CI](https://travis-ci.org/riichard/boolean-parser-js.svg?branch=master)
+
+# Boolean-parser
+
 This function converts a boolean query to a 2 dimensional array.
 `(a AND (b OR c))` -> `[[a, b],[a,c]]`.
 
