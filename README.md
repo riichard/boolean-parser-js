@@ -29,7 +29,7 @@ of a matching query.
 
 ## Philosophy
 The output is meant to be easily parsed to check for matches.
-There are more efficient ways to check matches to this query by only checking each term once, 
+There are more efficient ways to check matches to this query by only checking each term once,
 though this method is one that is easier to maintain and limits risk of side effects.
 Especially when considering recursively nested queries involving many brackets
 and AND/OR combinations.
@@ -41,7 +41,7 @@ npm install boolean-parser
 
 ## Usage
 ```javascript
-var booleanParser = require('booleanParser');
+var booleanParser = require('boolean-parser');
 
 var searchPhrase = '((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j';
 
