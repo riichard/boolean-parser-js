@@ -2,8 +2,8 @@
 
 # Boolean-parser
 
-This function converts a boolean query to a 2 dimensional array.
-`(a AND (b OR c))` -> `[[a, b],[a,c]]`.
+This function converts a boolean query to a 2 dimensional array with all possibilities.
+`(a AND (b OR c))` becomes `[[a, b],[a,c]]`.
 
 This works recursively and generates an array of all possible combinations
 of a matching query.
