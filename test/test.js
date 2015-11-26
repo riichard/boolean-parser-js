@@ -192,4 +192,5 @@ describe('parse function', function() {
       recursiveSort(bparser.parseBooleanQuery(searchPhrase))
     );
   })
+  // TODO create test for detecting duplicates
 });
