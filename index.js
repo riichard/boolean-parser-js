@@ -26,12 +26,9 @@
 // the one that is most easy to maintain and limits risk of side-effects.
 // Especially when considering recursively nested queries.
 function parseBooleanQuery(searchPhrase) {
-  console.log('parseBooleanQuery called with: ', searchPhrase);
 
   // Remove outer brackets if they exist. EX: (a OR b) -> a OR b
   searchPhrase = removeOuterBrackets(searchPhrase);
-  console.log('after strip', searchPhrase);
-
 
   // remove double whitespaces
   searchPhrase = removeDoubleWhiteSpace(searchPhrase);
@@ -44,7 +41,6 @@ function parseBooleanQuery(searchPhrase) {
 
     for (var i = 0; i < ands.length; i++) {
       if (containsBrackets(ands[i])) {
-        console.log(i, ands[i], parseBooleanQuery(ands[i]));
         nestedPaths.push(parseBooleanQuery(ands[i]));
       }
       else {
@@ -54,17 +50,12 @@ function parseBooleanQuery(searchPhrase) {
 
     // Merge the andPath and the nested OR paths together as one AND path
     nestedPaths.push([andPath]);
-    console.log('nestedPaths', nestedPaths);
-    var mergedOrsAnd = orsAndMerge(nestedPaths);
-    console.log('mergedOrsAnd', mergedOrsAnd);
-    return mergedOrsAnd;
+
+    // Merge all ors together in one OR query
+    return orsAndMerge(nestedPaths);
   });
 
-  console.log('orPath', orPath);
-  var mergedOrPath = mergeOrs(orPath);
-  console.log('mergedOrPath', mergedOrPath);
-
-  return mergedOrPath;
+  return mergeOrs(orPath);
 }
 
 // Removes double whitespace in a string
@@ -182,10 +173,8 @@ function splitRoot(splitTerm, phrase) {
       // When the tempNested contains just as much opening brackets as closing
       // brackets, we can declare it as 'complete'.
       var tempNestedString =  '' + tempNested;
-      console.log(tempNestedString);
       var countOpeningBrackets = (tempNestedString.match(/\(/g) || []).length;
       var countClosingBrackets = (tempNestedString.match(/\)/g) || []).length;
-      console.log('opening: ', countOpeningBrackets, 'closing:', countClosingBrackets);
 
       // If the amouth of opening brackets is the same as the amount of
       // closing brackets, then the string is complete.
@@ -206,10 +195,6 @@ function splitRoot(splitTerm, phrase) {
   return result;
 }
 
-//console.log(parseBooleanQuery(searchPhrase));
-
-//console.log(parseBooleanQuery('a AND b OR c'));
-//console.log(parseBooleanQuery('((a AND (b OR c)) AND (d AND e) AND (f OR g OR h))'));
 module.exports = {
   andAndMerge: andAndMerge,
   orAndOrMerge: orAndOrMerge,
