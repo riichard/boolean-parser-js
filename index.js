@@ -32,8 +32,8 @@
 // 6. Return the OR paths
 var searchPhrase = '((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j';
 
-function parseBooleanSearch(searchPhrase) {
-  //console.log('parseBooleanSearch called with: ', searchPhrase);
+function parseBooleanQuery(searchPhrase) {
+  //console.log('parseBooleanQuery called with: ', searchPhrase);
 
   // Remove outer brackets if they exist. EX: (a OR b) -> a OR b
   searchPhrase = removeOuterBrackets(searchPhrase);
@@ -49,8 +49,8 @@ function parseBooleanSearch(searchPhrase) {
 
     for (var i = 0; i < ands.length; i++) {
       if (containsBrackets(ands[i])) {
-        console.log(i, ands[i], parseBooleanSearch(ands[i]));
-        nestedPaths.push(parseBooleanSearch(ands[i]));
+        console.log(i, ands[i], parseBooleanQuery(ands[i]));
+        nestedPaths.push(parseBooleanQuery(ands[i]));
       }
       else {
         andPath.push(ands[i]);
@@ -121,7 +121,10 @@ function deduplicateOr(orPath) {
 // in -> x = [ a, b ], y = [ c, d ]
 // out -> [ a, b, c, d ]
 function andAndMerge(a, b) {
+  // Make a copy of a.
   var result = Array.prototype.slice.call(a);
+
+  // Append b to a
   for (var i = 0; i < b.length; i++) {
     result.push(b[i]);
   }
@@ -129,16 +132,24 @@ function andAndMerge(a, b) {
   return result;
 }
 
+// Removes the bracket at the beginning and end of a string. Only if they both
+// exist. Otherwise it returns the original phrase.
 function removeOuterBrackets(phrase) {
   return phrase.charAt(0) === '(' && phrase.charAt(phrase.length - 1) === ')' ?
     phrase.substring(1, phrase.length - 1) :
     phrase;
 }
 
+// Returns boolean true when string contains brackets '(' or ')', at any
+// position within the string
 function containsBrackets(str) {
   return !!~str.search(/\(|\)/);
 }
 
+// Splits a phrase into multiple strings by a split term. Like the split
+// function.
+// But then ignores the split terms that occur in between brackets
+// IE: ( blah TERM blah )
 function splitRoot(splitTerm, phrase) {
   var termSplit = phrase.split(' ' + splitTerm + ' ');
   var result = [];
@@ -178,17 +189,16 @@ function splitRoot(splitTerm, phrase) {
   return result;
 }
 
-console.log('andAndMerge [ a, b, c, d] == ', andAndMerge(['a', 'b'], ['c', 'd']));
-console.log('orAndOrMerge\na = [ [ a ], [ b ] ], \nb = [ [ c, d ], [ e, f ] ]:');
-console.log(
-  orAndOrMerge(
-    [ [ 'a', 'b' ] ],
-    [ [ 'c', 'd' ], [ 'e', 'f' ] ]
-  ));
+//console.log(parseBooleanQuery(searchPhrase));
 
-//console.log(removeOuterBrackets('(a OR b)'));
-
-//console.log(parseBooleanSearch(searchPhrase));
-
-//console.log(parseBooleanSearch('a AND b OR c'));
-//console.log(parseBooleanSearch('((a AND (b OR c)) AND (d AND e) AND (f OR g OR h))'));
+//console.log(parseBooleanQuery('a AND b OR c'));
+//console.log(parseBooleanQuery('((a AND (b OR c)) AND (d AND e) AND (f OR g OR h))'));
+module.exports = {
+  andAndMerge: andAndMerge,
+  orAndOrMerge: orAndOrMerge,
+  orsAndMerge: orsAndMerge,
+  splitRoot: splitRoot,
+  removeOuterBrackets: removeOuterBrackets,
+  parseBooleanQuery: parseBooleanQuery,
+  containsBrackets: containsBrackets
+};
