@@ -1,0 +1,30 @@
+{
+  "name": "boolean-parser",
+  "version": "0.0.0",
+  "description": "Script that parses a boolean query to an array with all the possibilities. IE: (apple AND (google OR facebook)) -> [[apple, google],[apple,facebook]]",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/riichard/boolean-parser-js.git"
+  },
+  "keywords": [
+    "boolean",
+    "keywords",
+    "parser",
+    "query",
+    "parser",
+    "lucene"
+  ],
+  "author": "Richard Kraaijenhagen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/riichard/boolean-parser-js/issues"
+  },
+  "homepage": "https://github.com/riichard/boolean-parser-js",
+  "dependencies": {
+    "mocha": "^2.3.4"
+  }
+}
