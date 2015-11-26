@@ -181,7 +181,8 @@ describe('parse function', function() {
   it('..long shot', function(){
     var searchPhrase = '((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j';
     assert.deepEqual(
-      recursiveSort([['a','b','d','e','f'],
+      recursiveSort(
+      [['a','b','d','e','f'],
        ['a','b','d','e','g'],
        ['a','b','d','e','h'],
        ['a','c','d','e','f'],

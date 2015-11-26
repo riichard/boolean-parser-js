@@ -1,19 +1,5 @@
-// (apple OR samsung) AND glass
-// [text*=apple][text*=glass]
-// [text*=samsung][text*=glass]
-
-// (apple OR samsung) AND (glass OR screen)
-// [text*=apple][text*=glass]
-// [text*=apple][text*=screen]
-// [text*=samsung][text*=glass]
-// [text*=samsung][text*=screen]
-//
-// (apple OR samsung) AND (glass OR screen) AND battery
-// [text*=apple][text*=glass][text*=battery+
-// [text*=apple][text*=screen]
-// [text*=samsung][text*=glass]
-// [text*=samsung][text*=screen]
-//
+// #######################################################
+// How does this library work
 // 1. Parse string to array of ORs (stuff between brackets count as one item
 // and will later be recursively parsed)
 // 2. Go trough each string in that array, and parse it to an array of ANDs
@@ -30,8 +16,15 @@
 // [ [a,b,d,e,f,x,y,z], [a,b,d,e,g,x,y,z], [a,b,d,e,h,x,y,z],
 //   [a,c,d,e,f,x,y,z], [a,c,d,e,g,x,y,z], [a,c,d,e,h,x,y,z] ]
 // 6. Return the OR paths
-var searchPhrase = '((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j';
 
+// This function converts a boolean query to a 2 dimensional array.
+// (a AND (b OR c)) -> [[a, b],[a,c]]
+// This works recursively and generates an array of all possible combination
+// of a matching  query.
+// The output is meant to be easily parsed to see if there are any matches.
+// There are more efficient ways to match content to this query, though this is
+// the one that is most easy to maintain and limits risk of side-effects.
+// Especially when considering recursively nested queries.
 function parseBooleanQuery(searchPhrase) {
   console.log('parseBooleanQuery called with: ', searchPhrase);
 
