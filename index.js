@@ -33,15 +33,17 @@
 var searchPhrase = '((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j';
 
 function parseBooleanQuery(searchPhrase) {
-  //console.log('parseBooleanQuery called with: ', searchPhrase);
+  console.log('parseBooleanQuery called with: ', searchPhrase);
 
   // Remove outer brackets if they exist. EX: (a OR b) -> a OR b
   searchPhrase = removeOuterBrackets(searchPhrase);
+  console.log('after strip', searchPhrase);
+
 
   // remove double whitespaces
-  //searchPhrase = searchPhrase.replace(/[\s]+/g, ' ');
-  var ors = splitRoot('OR', searchPhrase);
+  searchPhrase = removeDoubleWhiteSpace(searchPhrase);
 
+  var ors = splitRoot('OR', searchPhrase);
   var orPath = ors.map(function(andQuery) {
     var ands = splitRoot('AND', andQuery);
     var nestedPaths = [];
@@ -58,11 +60,25 @@ function parseBooleanQuery(searchPhrase) {
     }
 
     // Merge the andPath and the nested OR paths together as one AND path
-    nestedPaths.push(andPath);
-    return orsAndMerge(nestedPaths);
+    nestedPaths.push([andPath]);
+    console.log('nestedPaths', nestedPaths);
+    var mergedOrsAnd = orsAndMerge(nestedPaths);
+    console.log('mergedOrsAnd', mergedOrsAnd);
+    return mergedOrsAnd;
   });
 
-  return orPath;
+  console.log('orPath', orPath);
+  var mergedOrPath = mergeOrs(orPath);
+  console.log('mergedOrPath', mergedOrPath);
+
+  return mergedOrPath;
+}
+
+// Removes double whitespace in a string
+// In: a b  c\nd
+// Out: a b c d
+function removeDoubleWhiteSpace(phrase) {
+  return phrase.replace(/[\s]+/g, ' ');
 }
 
 // Merges 2 or paths together in an AND fashion
@@ -121,12 +137,20 @@ function deduplicateOr(orPath) {
 // in -> x = [ a, b ], y = [ c, d ]
 // out -> [ a, b, c, d ]
 function andAndMerge(a, b) {
-  // Make a copy of a.
-  var result = Array.prototype.slice.call(a);
+  return a.concat(b);
+}
 
-  // Append b to a
-  for (var i = 0; i < b.length; i++) {
-    result.push(b[i]);
+// Merges an array of OR queries, containing AND queries to a single OR query
+// In:
+// [ [ [ a, b ], [ c ] ],
+//   [ [ d ] ],
+//   [ [ e ], [ f, g ] ] ]
+// Out:
+// [ [ a, b ], [ c ], [ d ], [ e ], [ f, g ] ]
+function mergeOrs(ors) {
+  var result = ors[0];
+  for (var i = 1; i < ors.length; i++) {
+    result = result.concat(ors[i]);
   }
 
   return result;
@@ -197,7 +221,9 @@ module.exports = {
   andAndMerge: andAndMerge,
   orAndOrMerge: orAndOrMerge,
   orsAndMerge: orsAndMerge,
+  mergeOrs: mergeOrs,
   splitRoot: splitRoot,
+  removeDoubleWhiteSpace: removeDoubleWhiteSpace,
   removeOuterBrackets: removeOuterBrackets,
   parseBooleanQuery: parseBooleanQuery,
   containsBrackets: containsBrackets
