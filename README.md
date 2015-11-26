@@ -9,13 +9,30 @@ Whereas a, b and c represent words, forming a complex query pattern.
 This function works recursively trough all brackets and generates an array of all possible combinations
 of a matching query.
 
+For instance:
+
+```
+((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j
+```
+
+Becomes:
+```
+[[a,b,d,e,f],
+ [a,c,d,e,f],
+ [a,b,d,e,g],
+ [a,c,d,e,g],
+ [a,b,d,e,h],
+ [a,c,d,e,h],
+ [i],
+ [j]]
+```
+
 ## Philosophy
 The output is meant to be easily parsed to check for matches.
 There are more efficient ways to check matches to this query by only checking each term once, 
 though this method is one that is easier to maintain and limits risk of side effects.
 Especially when considering recursively nested queries involving many brackets
 and AND/OR combinations.
-
 
 ## Installing
 ```
