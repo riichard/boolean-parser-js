@@ -1,6 +1,30 @@
 var assert = require('assert');
 var bparser = require('../index.js');
 
+
+function recursiveSort(arr){
+  if(typeof arr  === 'string') return arr;
+  // Lets make a copy so we don't edit the original array
+  var result = [];
+  for(var i = 0; i < arr.length; i++){
+    result.push(recursiveSort(arr[i]));
+  }
+  return result.sort();
+}
+
+describe('Test utilities', function() {
+  describe('recursiveSort()', function() {
+    it('should sort an array recursively', function(){
+      assert.deepEqual(
+        [['a','b',['c','d','e','f']],['i'],['j'],'x'],
+        recursiveSort(
+          ['x',['j'],['i'],['b','a',['f','d','e','c']]]
+        )
+      );
+    });
+  });
+});
+
 describe('String functions', function() {
   describe('containsBrackets()', function() {
     it('should return true when brackets are present at the beginning OR end of the string', function() {
@@ -42,6 +66,19 @@ describe('String functions', function() {
         ['a', 'b'],
         bparser.splitRoot('AND', 'a AND b')
       );
+    });
+  });
+
+
+  describe('removeDoubleWhiteSpace', function() {
+    it('Should remove double spacebars', function(){
+      assert.equal('a b c', bparser.removeDoubleWhiteSpace('a  b c'));
+    });
+    it('Should remove double spacebars at multiple locations', function(){
+      assert.equal('a b c', bparser.removeDoubleWhiteSpace('a  b  c'));
+    });
+    it('Should convert linebreaks and tabs to a single space', function(){
+      assert.equal('a b c', bparser.removeDoubleWhiteSpace("a\nb\tc"));
     });
   });
 
@@ -97,12 +134,61 @@ describe('query merging functions', function() {
     });
   });
 
+  describe('mergeOrs()', function() {
+    it('Should merge a list of multilple sets of OR queries containing and queries', function() {
+      assert.deepEqual(
+        [['a', 'b'], ['c'], ['d'], ['e'], ['f', 'g']].sort(),
+        bparser.mergeOrs(
+           [[['a', 'b'], ['c']],
+            [['d']],
+            [['e'], ['f', 'g']]].sort()
+        )
+      );
+    });
+  });
 });
 
 describe('parse function', function() {
   it('Should parse a simple query without any brackets', function() {
     assert.deepEqual([['a', 'b']], bparser.parseBooleanQuery('a AND b'));
     assert.deepEqual([['a'], ['b']], bparser.parseBooleanQuery('a OR b'));
+    assert.deepEqual([['a','b'], ['c']], bparser.parseBooleanQuery('a AND b OR c'));
+    assert.deepEqual([['a'], ['b','c']], bparser.parseBooleanQuery('a OR  b AND c'));
   });
-
+  it('Should parse a simple query accidental whitespace', function() {
+    assert.deepEqual([['a'], ['b','c']], bparser.parseBooleanQuery('a OR  b AND c'));
+  });
+  it('Should parse a simple query a single depth of brackets', function() {
+    assert.deepEqual([['a','c'], ['b','c']], bparser.parseBooleanQuery('(a OR b) AND c'));
+  });
+  it('Should parse a query of 2 OR queries in a single depth of brackets', function() {
+    //assert.deepEqual(
+      //[['a','c'], ['b','c']],
+      //[['a','d'], ['b','c']],
+      //bparser.parseBooleanQuery('(a OR b) AND (c OR d)'));
+    //TODO this clearly doesn't work
+    //Problem description:
+    //When having a query that starts with brackets, and ends with brackets. It
+    //creates an infinite loop.
+    //It removes the brackets in the beginning, and in the end, creating a
+    //false query: 'b) AND (c'
+    assert.deepEqual(
+      [['a','c','x'], ['b','c','x'],
+       ['a','d','x'], ['b','d','x']].sort(),
+      bparser.parseBooleanQuery('x AND (a OR b) AND (c OR d)').sort()
+    );
+  });
+  it('..long shot', function(){
+    var searchPhrase = '((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j';
+    assert.deepEqual(
+      recursiveSort([['a','b','d','e','f'],
+       ['a','b','d','e','g'],
+       ['a','b','d','e','h'],
+       ['a','c','d','e','f'],
+       ['a','c','d','e','g'],
+       ['a','c','d','e','h'],
+       ['i'],['j']]),
+      recursiveSort(bparser.parseBooleanQuery(searchPhrase))
+    );
+  })
 });
