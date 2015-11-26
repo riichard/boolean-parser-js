@@ -4,14 +4,15 @@
 
 This function converts a boolean query to a 2 dimensional array with all possibilities.
 `(a AND (b OR c))` becomes `[[a, b],[a,c]]`.
+Whereas a, b and c represent words, forming a complex query pattern.
 
-This works recursively and generates an array of all possible combinations
+This function works recursively trough all brackets and generates an array of all possible combinations
 of a matching query.
 
 ## Philosophy
-The output is meant to be easily parsed to see if there are any matches.
-There are more efficient ways to match content to this query, though this is
-the one that is most easy to maintain and limits risk of side effects.
+The output is meant to be easily parsed to check for matches.
+There are more efficient ways to check matches to this query by only checking each term once, 
+though this method is one that is easier to maintain and limits risk of side effects.
 Especially when considering recursively nested queries involving many brackets
 and AND/OR combinations.
 
