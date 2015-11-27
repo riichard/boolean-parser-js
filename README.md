@@ -4,7 +4,7 @@
 
 This function converts a boolean query to a 2 dimensional array with all possibilities.
 ```
-(a AND (b OR c))```
+a AND (b OR c)
 ```
 
 Becomes:
@@ -22,7 +22,9 @@ of a matching query.
 | ----             | ----             |
 | Input:           | Output:          |
 | ----             | ----             |
-| `a AND b`        | `[[a, b]]`       |
+| a AND b        | [[a, b]]       |
+
+
 | `a OR  b`        | `[[a], [b]]`     |
 | `a AND b AND c`  | `[[a,b,c]]`      |
 | `a AND b OR  c`  | `[[a,b],[c]]`    |
