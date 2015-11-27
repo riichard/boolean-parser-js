@@ -12,7 +12,7 @@ Becomes:
 [[a, b],[a,c]]
 ```
 
-Whereas a, b and c represent words, forming a complex query pattern.
+Whereas `a`, `b` and `c` represent words, forming a complex query pattern.
 
 This function works recursively trough all brackets and generates an array of all possible combinations
 of a matching query.
