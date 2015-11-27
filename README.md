@@ -2,22 +2,9 @@
 
 # Boolean-parser
 
-This function converts a boolean query to a 2 dimensional array with all possibilities.
-```
-a AND (b OR c)
-```
+This function converts a boolean query to a 2 dimensional array with all possibilities. This allows you to quickly and easily see what scenarios will equal true in a complex boolean conditional.
 
-Becomes:
-```
-[[a, b], [a, c]]
-```
-
-Whereas `a`, `b` and `c` represent words, forming a complex query pattern.
-
-This function works recursively trough all brackets and generates an array of all possible combinations
-of a matching query.
-
-#### More examples:
+#### Examples:
 
 Input                         | Output
 --------                      | ---------
@@ -27,6 +14,11 @@ Input                         | Output
 `a AND b OR  c`               | `[[a, b], [c]]`
 `a AND (b OR c)`              | `[[a, b], [a, c]]`
 `a AND (b OR c) AND (d OR e)` | `[[a, b, d], [a, b, e], [a, c, d], [a, c, e]]`
+
+Whereas `a`, `b` and `c` represent words, forming a complex query pattern.
+
+This function works recursively trough all brackets and generates an array of all possible combinations
+of a matching query.
 
 #### Long term example
 
@@ -76,6 +68,9 @@ var parsedQuery = booleanParser.parseBooleanQuery(searchPhrase);
 //  ['i'],['j']]
 ```
 
+## Use cases
+This tool is great when constructing complex search filters that need to be matched with text. Creating search tools that need to show up more refined results than that would be possible with a simple `AND` combination.
+
 ## How does this library work
 1. Parse string to an Array of OR items (strings). Everything that's in between brackets
 will be treated as one word and will later be recursively parsed.
@@ -89,7 +84,6 @@ For instance, with the query:
 ```
 ((a AND (b OR c)) AND (d AND e) AND (f OR g OR h OR j)) AND x AND y AND z
 ```
-
 Path will look like the following.
 ```javascript
 // nestedPath =
@@ -97,16 +91,14 @@ Path will look like the following.
   [ [d,e] ],
   [ [f], [g], [h], [j] ] ]
 ```
-
 5. Then push the remaining non-bracket AND terms to this array.
-```
+```javascript
 // nestedPath =
 [ [ [a,b], [a,c] ],
   [ [d,e] ],
   [ [f], [g], [h], [j] ]
   [ [x,y,z] ] ]
 ```
-
 6. Then using the `orsAndMerge`, all those AND paths in those OR paths will be combined with the
 other OR combinations.
 In:
@@ -117,7 +109,6 @@ In:
     [ [ f ] ]
 ]
 ```
-
 Out:
 ```
 [
@@ -138,7 +129,6 @@ In:
     [ [ e ], [ f, g ] ]
 ]
 ```
-
 Out:
 ```
 [
