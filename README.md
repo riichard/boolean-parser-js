@@ -3,13 +3,32 @@
 # Boolean-parser
 
 This function converts a boolean query to a 2 dimensional array with all possibilities.
-`(a AND (b OR c))` becomes `[[a, b],[a,c]]`.
+```
+(a AND (b OR c))```
+```
+
+Becomes:
+```
+[[a, b],[a,c]]
+```
+
 Whereas a, b and c represent words, forming a complex query pattern.
 
 This function works recursively trough all brackets and generates an array of all possible combinations
 of a matching query.
 
-#### For instance:
+#### More examples:
+
+| ----             | ----             |
+| Input:           | Output:          |
+| ----             | ----             |
+| `a AND b`        | `[[a, b]]`       |
+| `a OR  b`        | `[[a], [b]]`     |
+| `a AND b AND c`  | `[[a,b,c]]`      |
+| `a AND b OR  c`  | `[[a,b],[c]]`    |
+| `a AND (b OR c)` | `[[a, b],[a,c]]` |
+
+
 
 ```
 ((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j
