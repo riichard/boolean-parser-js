@@ -2,6 +2,8 @@
 
 # Boolean-parser
 
+[![Join the chat at https://gitter.im/riichard/boolean-parser-js](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/riichard/boolean-parser-js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This function converts a boolean query to a 2 dimensional array with all possibilities.
 `(a AND (b OR c))` becomes `[[a, b],[a,c]]`.
 Whereas a, b and c represent words, forming a complex query pattern.
