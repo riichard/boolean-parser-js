@@ -76,4 +76,72 @@ var parsedQuery = booleanParser.parseBooleanQuery(searchPhrase);
 //  ['i'],['j']]
 ```
 
+## How does this library work
+1. Parse string to an Array of OR items (strings). Everything that's in between brackets
+will be treated as one word and will later be recursively parsed.
+2. Go trough each string in that Array, and parse it to an array of AND items.
+3. Recursively call the `parseBooleanQuery` function on whatever is in between
+brackets. These recursive calls will return an array of all possible combinations
+within those brackets. (An `OR` array of `AND` combinations)
+4. Create an empty array called `nestedPaths`. And add all nested combinations that
+are in between brackets to that array.
+For instance, with the query:
+```
+((a AND (b OR c)) AND (d AND e) AND (f OR g OR h OR j)) AND x AND y AND z
+```
 
+Path will look like the following.
+```javascript
+// nestedPath =
+[ [ [a,b], [a,c] ],
+  [ [d,e] ],
+  [ [f], [g], [h], [j] ] ]
+```
+
+5. Then push the remaining non-bracket AND terms to this array.
+```
+// nestedPath =
+[ [ [a,b], [a,c] ],
+  [ [d,e] ],
+  [ [f], [g], [h], [j] ]
+  [ [x,y,z] ] ]
+```
+
+6. Then using the `orsAndMerge`, all those AND paths in those OR paths will be combined with the
+other OR combinations.
+In:
+```
+[
+    [ [ a ], [ b ] ],
+    [ [ c, d ], [ e ] ],
+    [ [ f ] ]
+]
+```
+
+Out:
+```
+[
+    [ a, c, d, f ],
+    [ b, c, d, f ],
+    [ a, e, f ],
+    [ b, e, f ]
+]
+```
+
+7. Then we concatenate all those `OR` paths that were in between those `OR` terms
+to one Array using the `mergeOrs` function.
+In:
+```
+[
+    [ [ a, b ], [ c ] ],
+    [ [ d ] ],
+    [ [ e ], [ f, g ] ]
+]
+```
+
+Out:
+```
+[
+    [ a, b ], [ c ], [ d ], [ e ], [ f, g ]
+]
+```

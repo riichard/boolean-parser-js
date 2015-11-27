@@ -1,26 +1,16 @@
-// #######################################################
-// How does this library work
-// 1. Parse string to array of ORs (stuff between brackets count as one item
-// and will later be recursively parsed)
-// 2. Go trough each string in that array, and parse it to an array of ANDs
-// 3. Recursively call this parsing function on whatever is in between
-// brackets. These calls will return an array of all possible combinations
-// within those brackets. (An OR array of AND combinations)
-// 4. Create an empty array called `paths`.
-// [ [a,b], [a,c] ],
-// [ [d,e] ],
-// [ [f], [g], [h] j
-// And push the remaining non-bracket terms to this array in the same style
-// [ [x,y,z] ]
-// --- to ->
-// [ [a,b,d,e,f,x,y,z], [a,b,d,e,g,x,y,z], [a,b,d,e,h,x,y,z],
-//   [a,c,d,e,f,x,y,z], [a,c,d,e,g,x,y,z], [a,c,d,e,h,x,y,z] ]
-// 6. Return the OR paths
+// Boolean-parser.js
+// -----------------
+// License: MIT
+// More information on what this does, and how the whole library works can be
+// found in the README or on the github page.
+// https://github.com/riichard/boolean-parser-js/blob/master/README.md
 
 // This function converts a boolean query to a 2 dimensional array.
-// (a AND (b OR c)) -> [[a, b],[a,c]]
+// a AND (b OR c)
+// Becomes:
+// [[a, b],[a,c]]
 // This works recursively and generates an array of all possible combination
-// of a matching  query.
+// of a matching query.
 // The output is meant to be easily parsed to see if there are any matches.
 // There are more efficient ways to match content to this query, though this is
 // the one that is most easy to maintain and limits risk of side-effects.
@@ -33,34 +23,54 @@ function parseBooleanQuery(searchPhrase) {
   // remove double whitespaces
   searchPhrase = removeDoubleWhiteSpace(searchPhrase);
 
+  // Split the phrase on the term 'OR', but don't do this on 'OR' that's in
+  // between brackets. EX: a OR (b OR c) should not parse the `OR` in between b
+  // and c.
   var ors = splitRoot('OR', searchPhrase);
+
+  // Each parsed string returns a parsed array in this map function.
   var orPath = ors.map(function(andQuery) {
+
+    // Split on the word 'AND'. Yet again, don't split `AND` that's written in
+    // between brackets. We'll parse those later recursively.
     var ands = splitRoot('AND', andQuery);
+
+    // All nested parsed queries will be stored in `nestedPaths`.
+    // Nested means 'in between brackets'.
     var nestedPaths = [];
+
+    // All that's not nested will be stored in the andPath array.
+    // This array contains words that will later be merged with the parsed
+    // queries from nestedPaths.
     var andPath = [];
 
+    // Iterate trough all the strings from the AND query
     for (var i = 0; i < ands.length; i++) {
+      // If the string contains brackets, parse it recursively, and add it to
+      // `nestedPaths`.
       if (containsBrackets(ands[i])) {
         nestedPaths.push(parseBooleanQuery(ands[i]));
       }
+      // If it doesn't. Push the word to `andPath`.
       else {
         andPath.push(ands[i]);
       }
     }
 
-    // Merge the andPath and the nested OR paths together as one AND path
+    // Merge the andPath and the nested OR paths together as one `AND` path
     nestedPaths.push([andPath]);
 
-    // Merge all ors together in one OR query
+    // Merge all `ANDs` and `ORs` together in one OR query
     return orsAndMerge(nestedPaths);
   });
 
+  // Merge all OR query paths together into one Array.
   return mergeOrs(orPath);
 }
 
 // Removes double whitespace in a string
-// In: a b  c\nd
-// Out: a b c d
+// In: a b  c\nd\te
+// Out: a b c d e
 function removeDoubleWhiteSpace(phrase) {
   return phrase.replace(/[\s]+/g, ' ');
 }
@@ -143,6 +153,7 @@ function mergeOrs(ors) {
 
 // Removes the bracket at the beginning and end of a string. Only if they both
 // exist. Otherwise it returns the original phrase.
+// Ex: (a OR b) -> a OR b
 function removeOuterBrackets(phrase) {
   return phrase.charAt(0) === '(' && phrase.charAt(phrase.length - 1) === ')' ?
     phrase.substring(1, phrase.length - 1) :
@@ -151,6 +162,8 @@ function removeOuterBrackets(phrase) {
 
 // Returns boolean true when string contains brackets '(' or ')', at any
 // position within the string
+// Ex: (b AND c)  -> true
+// Ex: b AND c    -> false
 function containsBrackets(str) {
   return !!~str.search(/\(|\)/);
 }
@@ -158,7 +171,14 @@ function containsBrackets(str) {
 // Splits a phrase into multiple strings by a split term. Like the split
 // function.
 // But then ignores the split terms that occur in between brackets
-// IE: ( blah TERM blah )
+// Example when splitting on AND:
+// In: a AND (b AND c)
+// Out: ['a', '(b AND c)']
+// We do this by using the built in 'split' function. But as soon as we notice
+// our string contains brackets, we create a temporary string, append any
+// folling string from the `split` results. And stop doing that when we counted
+// as many opening brackets as closing brackets. Then append that string to the
+// results as a single string.
 function splitRoot(splitTerm, phrase) {
   var termSplit = phrase.split(' ' + splitTerm + ' ');
   var result = [];
@@ -166,8 +186,9 @@ function splitRoot(splitTerm, phrase) {
   for (var i = 0; i < termSplit.length; i++) {
 
     // If we are dealing with a split in a nested query,
-    // add it to tempNested, and rebuild the incorrectly parsed nested query
-    // by putting split statement back where it was.
+    // add it to the tempNested array, and rebuild the incorrectly parsed nested query
+    // later, by re-joining the array with the `splitTerm`, to make it look
+    // like it's original state.
     if (containsBrackets(termSplit[i]) || tempNested.length > 0) {
       tempNested.push(termSplit[i]);
 
@@ -196,6 +217,7 @@ function splitRoot(splitTerm, phrase) {
   return result;
 }
 
+// Export all functions as a module
 module.exports = {
   andAndMerge: andAndMerge,
   orAndOrMerge: orAndOrMerge,
