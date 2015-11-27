@@ -2,7 +2,9 @@
 
 # Boolean-parser
 
-This function converts a boolean query to a 2 dimensional array with all possibilities.
+This function converts a boolean query to a 2 dimensional array with all possibilities. This allows you to quickly and easily see what scenarios will equal true in a complex boolean conditional.
+
+For instance.
 ```
 a AND (b OR c)
 ```
