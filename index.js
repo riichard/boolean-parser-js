@@ -51,6 +51,7 @@ function parseBooleanQuery(searchPhrase) {
       if (containsBrackets(ands[i])) {
         nestedPaths.push(parseBooleanQuery(ands[i]));
       }
+
       // If it doesn't. Push the word to `andPath`.
       else {
         andPath.push(ands[i]);
@@ -154,10 +155,50 @@ function mergeOrs(ors) {
 // Removes the bracket at the beginning and end of a string. Only if they both
 // exist. Otherwise it returns the original phrase.
 // Ex: (a OR b) -> a OR b
+// But yet doesn't remove the brackets when the last bracket isn't linked to
+// the first bracket.
+// Ex: (a OR b) AND (x OR y) -> (a OR b) AND (x OR y)
 function removeOuterBrackets(phrase) {
-  return phrase.charAt(0) === '(' && phrase.charAt(phrase.length - 1) === ')' ?
-    phrase.substring(1, phrase.length - 1) :
-    phrase;
+  // If the first character is a bracket
+  if (phrase.charAt(0) === '(') {
+
+    // Now we'll see if the closing bracket to the first character is the last
+    // character. If so. Remove the brackets. Otherwise, leave it as it is.
+    // We'll check that by incrementing the counter with every opening bracket,
+    // and decrement it with each closing bracket.
+    // When the counter hits 0. We are at the end bracket.
+    var counter = 0;
+    for (var i = 0; i < phrase.length; i++) {
+
+      // Increment the counter at each '('
+      if (phrase.charAt(i) === '(') counter++;
+
+      // Decrement the counter at each ')'
+      else if (phrase.charAt(i) === ')') counter--;
+
+      // If the counter is at 0, we are at the closing bracket.
+      if (counter === 0) {
+        console.log('counter is at 0');
+
+        // If we are not at the end of the sentence, Return the
+        // phrase as-is without modifying it
+        if (i !== phrase.length - 1) {
+          console.log('closing bracket is not at the end, ', phrase);
+          return phrase;
+        }
+
+        // If we are at the end, return the phrase without the surrounding brackets.
+        else {
+          console.log('closing bracket IS at the end, ', phrase);
+          return phrase.substring(1, phrase.length - 1);
+        }
+      }
+    }
+
+  }
+  console.log('returning the phrase as is.');
+
+  return phrase;
 }
 
 // Returns boolean true when string contains brackets '(' or ')', at any

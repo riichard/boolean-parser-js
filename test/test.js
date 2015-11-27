@@ -1,24 +1,26 @@
 var assert = require('assert');
 var bparser = require('../index.js');
 
-
 function recursiveSort(arr){
-  if(typeof arr  === 'string') return arr;
+  if (typeof arr  === 'string') return arr;
+
   // Lets make a copy so we don't edit the original array
   var result = [];
-  for(var i = 0; i < arr.length; i++){
+  for (var i = 0; i < arr.length; i++) {
     result.push(recursiveSort(arr[i]));
   }
+
   return result.sort();
 }
 
 describe('Test utilities', function() {
   describe('recursiveSort()', function() {
-    it('should sort an array recursively', function(){
+    it('should sort an array recursively', function() {
+
       assert.deepEqual(
-        [['a','b',['c','d','e','f']],['i'],['j'],'x'],
+        [['a', 'b', ['c', 'd', 'e', 'f']], ['i'], ['j'], 'x'],
         recursiveSort(
-          ['x',['j'],['i'],['b','a',['f','d','e','c']]]
+          ['x', ['j'], ['i'], ['b', 'a', ['f', 'd', 'e', 'c']]]
         )
       );
     });
@@ -50,6 +52,11 @@ describe('String functions', function() {
     it('should not remove the brackets when one of the two brackets is inside the string', function() {
       assert.equal('(richard ) katie', bparser.removeOuterBrackets('(richard ) katie'));
     });
+
+    it('should not remove the closing brackets, when the last character is a bracket, but is not related to the first character bracket', function() {
+      assert.equal('(a OR b) AND (c OR d)',
+                   bparser.removeOuterBrackets('(a OR b) AND (c OR d)'));
+    });
   });
 
   describe('splitRoot()', function() {
@@ -69,15 +76,16 @@ describe('String functions', function() {
     });
   });
 
-
   describe('removeDoubleWhiteSpace', function() {
-    it('Should remove double spacebars', function(){
+    it('Should remove double spacebars', function() {
       assert.equal('a b c', bparser.removeDoubleWhiteSpace('a  b c'));
     });
-    it('Should remove double spacebars at multiple locations', function(){
+
+    it('Should remove double spacebars at multiple locations', function() {
       assert.equal('a b c', bparser.removeDoubleWhiteSpace('a  b  c'));
     });
-    it('Should convert linebreaks and tabs to a single space', function(){
+
+    it('Should convert linebreaks and tabs to a single space', function() {
       assert.equal('a b c', bparser.removeDoubleWhiteSpace("a\nb\tc"));
     });
   });
@@ -152,26 +160,26 @@ describe('parse function', function() {
   it('Should parse a simple query without any brackets', function() {
     assert.deepEqual([['a', 'b']], bparser.parseBooleanQuery('a AND b'));
     assert.deepEqual([['a'], ['b']], bparser.parseBooleanQuery('a OR b'));
-    assert.deepEqual([['a','b'], ['c']], bparser.parseBooleanQuery('a AND b OR c'));
-    assert.deepEqual([['a'], ['b','c']], bparser.parseBooleanQuery('a OR  b AND c'));
+    assert.deepEqual([['a', 'b'], ['c']], bparser.parseBooleanQuery('a AND b OR c'));
+    assert.deepEqual([['a'], ['b', 'c']], bparser.parseBooleanQuery('a OR  b AND c'));
   });
   it('Should parse a simple query accidental whitespace', function() {
     assert.deepEqual([['a'], ['b','c']], bparser.parseBooleanQuery('a OR  b AND c'));
   });
   it('Should parse a simple query a single depth of brackets', function() {
-    assert.deepEqual([['a','c'], ['b','c']], bparser.parseBooleanQuery('(a OR b) AND c'));
+    assert.deepEqual([['a', 'c'], ['b', 'c']], bparser.parseBooleanQuery('(a OR b) AND c'));
   });
-  it('Should parse a query of 2 OR queries in a single depth of brackets', function() {
-    //assert.deepEqual(
-      //[['a','c'], ['b','c']],
-      //[['a','d'], ['b','c']],
-      //bparser.parseBooleanQuery('(a OR b) AND (c OR d)'));
-    //TODO this clearly doesn't work
-    //Problem description:
-    //When having a query that starts with brackets, and ends with brackets. It
-    //creates an infinite loop.
-    //It removes the brackets in the beginning, and in the end, creating a
-    //false query: 'b) AND (c'
+
+  // This resolves to issue #3 on github
+  it('Should parse a query, where the final bracket is not related to the first bracket', function() {
+    assert.deepEqual(
+      recursiveSort(
+        [ ['a','c'], ['b','c'],
+          ['a','d'], ['b','d']]),
+      recursiveSort(
+        bparser.parseBooleanQuery('(a OR b) AND (c OR d)')
+      )
+    );
     assert.deepEqual(
       [['a','c','x'], ['b','c','x'],
        ['a','d','x'], ['b','d','x']].sort(),
@@ -191,6 +199,7 @@ describe('parse function', function() {
        ['i'],['j']]),
       recursiveSort(bparser.parseBooleanQuery(searchPhrase))
     );
-  })
+  });
+
   // TODO create test for detecting duplicates
 });
