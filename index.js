@@ -2,7 +2,7 @@
 // -----------------
 // License: MIT
 // More information on what this does, and how the whole library works can be
-// found in the README or on the github page.
+// found in the README.md or on the github page.
 // https://github.com/riichard/boolean-parser-js/blob/master/README.md
 
 // This function converts a boolean query to a 2 dimensional array.
