@@ -4,22 +4,7 @@
 
 This function converts a boolean query to a 2 dimensional array with all possibilities. This allows you to quickly and easily see what scenarios will equal true in a complex boolean conditional.
 
-For instance.
-```
-a AND (b OR c)
-```
-
-Becomes:
-```
-[[a, b], [a, c]]
-```
-
-Whereas `a`, `b` and `c` represent words, forming a complex query pattern.
-
-This function works recursively trough all brackets and generates an array of all possible combinations
-of a matching query.
-
-#### More examples:
+#### Examples:
 
 Input                         | Output
 --------                      | ---------
@@ -29,6 +14,11 @@ Input                         | Output
 `a AND b OR  c`               | `[[a, b], [c]]`
 `a AND (b OR c)`              | `[[a, b], [a, c]]`
 `a AND (b OR c) AND (d OR e)` | `[[a, b, d], [a, b, e], [a, c, d], [a, c, e]]`
+
+Whereas `a`, `b` and `c` represent words, forming a complex query pattern.
+
+This function works recursively trough all brackets and generates an array of all possible combinations
+of a matching query.
 
 #### Long term example
 
