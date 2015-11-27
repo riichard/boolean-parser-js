@@ -89,7 +89,6 @@ For instance, with the query:
 ```
 ((a AND (b OR c)) AND (d AND e) AND (f OR g OR h OR j)) AND x AND y AND z
 ```
-
 Path will look like the following.
 ```javascript
 // nestedPath =
@@ -97,16 +96,14 @@ Path will look like the following.
   [ [d,e] ],
   [ [f], [g], [h], [j] ] ]
 ```
-
 5. Then push the remaining non-bracket AND terms to this array.
-```
+```javascript
 // nestedPath =
 [ [ [a,b], [a,c] ],
   [ [d,e] ],
   [ [f], [g], [h], [j] ]
   [ [x,y,z] ] ]
 ```
-
 6. Then using the `orsAndMerge`, all those AND paths in those OR paths will be combined with the
 other OR combinations.
 In:
@@ -117,7 +114,6 @@ In:
     [ [ f ] ]
 ]
 ```
-
 Out:
 ```
 [
@@ -138,7 +134,6 @@ In:
     [ [ e ], [ f, g ] ]
 ]
 ```
-
 Out:
 ```
 [
