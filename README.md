@@ -9,7 +9,7 @@ a AND (b OR c)
 
 Becomes:
 ```
-[[a, b],[a,c]]
+[[a, b], [a, c]]
 ```
 
 Whereas `a`, `b` and `c` represent words, forming a complex query pattern.
