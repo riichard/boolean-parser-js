@@ -19,10 +19,10 @@ of a matching query.
 
 #### More examples:
 
-| ----             | ----             |
-| Input:           | Output:          |
-| ----             | ----             |
-| a AND b        | [[a, b]]       |
+| -------- | --------- |
+| Input:   | Output:   |
+| -------- | --------- |
+| a AND b  | [[a, b]]  |
 
 
 | `a OR  b`        | `[[a], [b]]`     |
