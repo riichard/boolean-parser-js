@@ -19,13 +19,14 @@ of a matching query.
 
 #### More examples:
 
-Input   | Output 
--------- | ---------
-`a AND b`  | `[[a, b]]`
-`a OR  b`        | `[[a], [b]]`    
-`a AND b AND c`  | `[[a,b,c]]` 
-`a AND b OR  c`  | `[[a,b],[c]]`
-`a AND (b OR c)` | `[[a, b],[a,c]]`
+Input                         | Output
+--------                      | ---------
+`a AND b`                     | `[[a, b]]`
+`a OR  b`                     | `[[a], [b]]`
+`a AND b AND c`               | `[[a, b, c]]`
+`a AND b OR  c`               | `[[a, b], [c]]`
+`a AND (b OR c)`              | `[[a, b], [a, c]]`
+`a AND (b OR c) AND (d OR e)` | `[[a, b, d], [a, b, e], [a, c, d], [a, c, e]]`
 
 #### Long term example
 
