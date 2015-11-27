@@ -110,13 +110,13 @@ function orsAndMerge(ors) {
   return result;
 }
 
+// TODO
 // Removes duplicate and paths within an or path
 // in:
 //  [ [ a, b ], [ c ], [ a, b ] ]
 // out:
 //  [ [ a, b ], [ c ] ]
 function deduplicateOr(orPath) {
-  // TODO
 }
 
 // in -> x = [ a, b ], y = [ c, d ]
