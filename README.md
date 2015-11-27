@@ -68,6 +68,9 @@ var parsedQuery = booleanParser.parseBooleanQuery(searchPhrase);
 //  ['i'],['j']]
 ```
 
+## Use cases
+This tool is great when constructing complex search filters that need to be matched with text. Creating search tools that need to show up more refined results than that would be possible with a simple `AND` combination.
+
 ## How does this library work
 1. Parse string to an Array of OR items (strings). Everything that's in between brackets
 will be treated as one word and will later be recursively parsed.
