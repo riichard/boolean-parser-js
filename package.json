@@ -24,7 +24,7 @@
     "url": "https://github.com/riichard/boolean-parser-js/issues"
   },
   "homepage": "https://github.com/riichard/boolean-parser-js",
-  "dependencies": {
-    "mocha": "^2.3.4"
+  "devDependencies": {
+    "mocha": "^3.1.0"
   }
 }
