@@ -186,25 +186,21 @@ function removeOuterBrackets(phrase) {
 
       // If the counter is at 0, we are at the closing bracket.
       if (counter === 0) {
-        console.log('counter is at 0');
 
         // If we are not at the end of the sentence, Return the
         // phrase as-is without modifying it
         if (i !== phrase.length - 1) {
-          console.log('closing bracket is not at the end, ', phrase);
           return phrase;
         }
 
         // If we are at the end, return the phrase without the surrounding brackets.
         else {
-          console.log('closing bracket IS at the end, ', phrase);
           return phrase.substring(1, phrase.length - 1);
         }
       }
     }
 
   }
-  console.log('returning the phrase as is.');
 
   return phrase;
 }
