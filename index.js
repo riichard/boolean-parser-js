@@ -128,7 +128,7 @@ function orsAndMerge(ors) {
 //  [ [ a, b ], [ c ] ]
 function deduplicateOr(orPath) {
   var found = {};
-  return orPath.filter(function(andPath, i, self){
+  return orPath.filter(function(andPath){
     const hash = andPath.toString();
     if (hash in found) {
       return false;
