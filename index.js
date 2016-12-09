@@ -121,13 +121,21 @@ function orsAndMerge(ors) {
   return result;
 }
 
-// TODO
 // Removes duplicate and paths within an or path
 // in:
 //  [ [ a, b ], [ c ], [ a, b ] ]
 // out:
 //  [ [ a, b ], [ c ] ]
 function deduplicateOr(orPath) {
+  var found = {};
+  return orPath.filter(function(andPath, i, self){
+    const hash = andPath.toString();
+    if (hash in found) {
+      return false;
+    }
+    found[hash] = true;
+    return true;
+  });
 }
 
 // in -> x = [ a, b ], y = [ c, d ]
@@ -260,6 +268,7 @@ function splitRoot(splitTerm, phrase) {
 
 // Export all functions as a module
 module.exports = {
+  deduplicateOr: deduplicateOr,
   andAndMerge: andAndMerge,
   orAndOrMerge: orAndOrMerge,
   orsAndMerge: orsAndMerge,

@@ -154,6 +154,17 @@ describe('query merging functions', function() {
       );
     });
   });
+
+  describe('deduplicateOr()', function() {
+    it('Should remove duplicate and paths within an or path', function() {
+      assert.deepEqual(
+        [ [ 'a', 'b' ], [ 'c' ] ],
+        bparser.deduplicateOr(
+           [ [ 'a', 'b' ], [ 'c' ], [ 'a', 'b' ] ]
+        )
+      );
+    });
+  });
 });
 
 describe('parse function', function() {
@@ -201,5 +212,4 @@ describe('parse function', function() {
     );
   });
 
-  // TODO create test for detecting duplicates
 });
