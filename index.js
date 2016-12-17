@@ -5,6 +5,25 @@
 // found in the README.md or on the github page.
 // https://github.com/riichard/boolean-parser-js/blob/master/README.md
 
+// Return true if arrays are equal
+function _arraysAreEqual(arrA, arrB) {
+  if (!Array.isArray(arrA) || !Array.isArray(arrB))
+  {
+    throw new TypeError("both parameters have to be an array");
+  }
+  if (arrA.length !== arrB.length)
+  {
+    return false;
+  }
+  for (var i = 0; i < arrA.length; i++) {
+    // No deep equal necessary
+    if (arrA[i] !== arrB[i]){
+      return false;
+    }
+  }
+  return true;
+}
+
 // This function converts a boolean query to a 2 dimensional array.
 // a AND (b OR c)
 // Becomes:
@@ -123,19 +142,29 @@ function orsAndMerge(ors) {
 
 // Removes duplicate and paths within an or path
 // in:
-//  [ [ a, b ], [ c ], [ a, b ] ]
+//  [ [ a, b ], [ c ], [ b, a ] ]
 // out:
 //  [ [ a, b ], [ c ] ]
-function deduplicateOr(orPath) {
-  var found = {};
-  return orPath.filter(function(andPath){
-    const hash = andPath.toString();
-    if (hash in found) {
-      return false;
+//
+// with order matters
+// in:
+//  [ [ a, b ], [ c ], [ b, a ] ]
+// out:
+//  [ [ a, b ], [ c ], [ b, a ] ]
+function deduplicateOr(orPath, orderMatters) {
+  var path = orderMatters ?
+    orPath :
+    orPath.map(function(item) { return item.sort() });
+
+  return path.reduce(function(memo, current){
+    for (var i = 0; i < memo.length; i++) {
+      if (_arraysAreEqual(memo[i], current)) {
+        return memo;
+      }
     }
-    found[hash] = true;
-    return true;
-  });
+    memo.push(current);
+    return memo;
+  }, []);
 }
 
 // in -> x = [ a, b ], y = [ c, d ]

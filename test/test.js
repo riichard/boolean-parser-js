@@ -156,11 +156,20 @@ describe('query merging functions', function() {
   });
 
   describe('deduplicateOr()', function() {
-    it('Should remove duplicate and paths within an or path', function() {
+    it('Should remove duplicate and-paths within an or-path', function() {
       assert.deepEqual(
         [ [ 'a', 'b' ], [ 'c' ] ],
         bparser.deduplicateOr(
-           [ [ 'a', 'b' ], [ 'c' ], [ 'a', 'b' ] ]
+          [ [ 'a', 'b' ], [ 'c' ], [ 'a', 'b' ], [ 'b', 'a' ] ]
+        )
+      );
+    });
+    it('Should remove duplicate and-paths within an or-path (order matters)', function() {
+      assert.deepEqual(
+        [ [ 'a', 'b' ], [ 'c' ], [ 'b', 'a' ] ],
+        bparser.deduplicateOr(
+           [ [ 'a', 'b' ], [ 'c' ], [ 'a', 'b' ], [ 'b', 'a' ] ],
+           true
         )
       );
     });
