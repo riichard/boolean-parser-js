@@ -5,6 +5,25 @@
 // found in the README.md or on the github page.
 // https://github.com/riichard/boolean-parser-js/blob/master/README.md
 
+// Return true if arrays are equal
+function _arraysAreEqual(arrA, arrB) {
+  if (!Array.isArray(arrA) || !Array.isArray(arrB))
+  {
+    throw new TypeError("both parameters have to be an array");
+  }
+  if (arrA.length !== arrB.length)
+  {
+    return false;
+  }
+  for (var i = 0; i < arrA.length; i++) {
+    // No deep equal necessary
+    if (arrA[i] !== arrB[i]){
+      return false;
+    }
+  }
+  return true;
+}
+
 // This function converts a boolean query to a 2 dimensional array.
 // a AND (b OR c)
 // Becomes:
@@ -121,13 +140,31 @@ function orsAndMerge(ors) {
   return result;
 }
 
-// TODO
 // Removes duplicate and paths within an or path
 // in:
-//  [ [ a, b ], [ c ], [ a, b ] ]
+//  [ [ a, b ], [ c ], [ b, a ] ]
 // out:
 //  [ [ a, b ], [ c ] ]
-function deduplicateOr(orPath) {
+//
+// with order matters
+// in:
+//  [ [ a, b ], [ c ], [ b, a ] ]
+// out:
+//  [ [ a, b ], [ c ], [ b, a ] ]
+function deduplicateOr(orPath, orderMatters) {
+  var path = orderMatters ?
+    orPath :
+    orPath.map(function(item) { return item.sort() });
+
+  return path.reduce(function(memo, current){
+    for (var i = 0; i < memo.length; i++) {
+      if (_arraysAreEqual(memo[i], current)) {
+        return memo;
+      }
+    }
+    memo.push(current);
+    return memo;
+  }, []);
 }
 
 // in -> x = [ a, b ], y = [ c, d ]
@@ -178,25 +215,21 @@ function removeOuterBrackets(phrase) {
 
       // If the counter is at 0, we are at the closing bracket.
       if (counter === 0) {
-        console.log('counter is at 0');
 
         // If we are not at the end of the sentence, Return the
         // phrase as-is without modifying it
         if (i !== phrase.length - 1) {
-          console.log('closing bracket is not at the end, ', phrase);
           return phrase;
         }
 
         // If we are at the end, return the phrase without the surrounding brackets.
         else {
-          console.log('closing bracket IS at the end, ', phrase);
           return phrase.substring(1, phrase.length - 1);
         }
       }
     }
 
   }
-  console.log('returning the phrase as is.');
 
   return phrase;
 }
@@ -260,6 +293,7 @@ function splitRoot(splitTerm, phrase) {
 
 // Export all functions as a module
 module.exports = {
+  deduplicateOr: deduplicateOr,
   andAndMerge: andAndMerge,
   orAndOrMerge: orAndOrMerge,
   orsAndMerge: orsAndMerge,
