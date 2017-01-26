@@ -1,6 +1,6 @@
 {
   "name": "boolean-parser",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Script that parses a boolean query to an array with all the possibilities. IE: (a AND (b OR c)) -> [[a, b],[a, c]]",
   "main": "index.js",
   "scripts": {
