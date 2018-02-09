@@ -131,6 +131,8 @@ describe('String functions', function() {
       assert.equal('a AND b', bparser.injectOperatorBetweenTerms('a b'));
       assert.equal('a AND b', bparser.injectOperatorBetweenTerms('a AND b'));
       assert.equal('a OR b', bparser.injectOperatorBetweenTerms('a OR b'));
+      assert.equal('((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j', bparser.injectOperatorBetweenTerms(' ( ( a AND ( b OR c ) ) AND ( d AND e ) AND ( f OR g OR h ) ) OR i OR j '));
+      assert.equal('((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j', bparser.injectOperatorBetweenTerms('((a ( b OR c)) (d e) (f OR g OR h)) OR i OR j'));
     });
 
     it('should add in ORs to the searchPhrase, if specified', function() {
@@ -140,6 +142,8 @@ describe('String functions', function() {
       assert.equal('a OR b', bparser.injectOperatorBetweenTerms('a b'));
       assert.equal('a AND b', bparser.injectOperatorBetweenTerms('a AND b'));
       assert.equal('a OR b', bparser.injectOperatorBetweenTerms('a OR b'));
+      assert.equal('((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j', bparser.injectOperatorBetweenTerms(' ( ( a AND ( b OR c ) ) AND ( d AND e ) AND ( f OR g OR h ) ) OR i OR j '));
+      assert.equal('((a AND (b OR c)) AND (d AND e) AND (f OR g OR h)) OR i OR j', bparser.injectOperatorBetweenTerms('((a AND (b c)) AND (d AND e) AND (f g h)) i j'));
 			// Restore the old split term
 			bparser.defaultSplitTerm = oldSplitTerm;
     });

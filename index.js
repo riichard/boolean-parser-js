@@ -49,11 +49,15 @@ function injectOperatorBetweenTerms(searchPhrase) {
     searchPhrase = searchPhrase.replace(/ /gi, ' AND ');
     searchPhrase = searchPhrase.replace(/ AND AND AND /gi, ' AND ');
     searchPhrase = searchPhrase.replace(/ AND OR AND /gi, ' OR ');
+    searchPhrase = searchPhrase.replace(/\( AND /gi, '(');
+    searchPhrase = searchPhrase.replace(/ AND \)/gi, ')');
 	} else {
 		// replace all spaces with ' OR ', then remove any extra ORs
     searchPhrase = searchPhrase.replace(/ /gi, ' OR ');
     searchPhrase = searchPhrase.replace(/ OR AND OR /gi, ' AND ');
     searchPhrase = searchPhrase.replace(/ OR OR OR /gi, ' OR ');
+    searchPhrase = searchPhrase.replace(/\( OR /gi, '(');
+    searchPhrase = searchPhrase.replace(/ OR \)/gi, ')');
 	}
 	return searchPhrase;
 }
