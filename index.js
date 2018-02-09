@@ -49,7 +49,6 @@ function escapeCharactersInQuotes(searchPhrase){
 
 function unescapeCharactersInQuotes(permutations){
   var decodedPermutations = [];
-  var termSet = new Set();
 
   permutations.forEach(function(element){
       var decodedElement = [];
@@ -59,15 +58,12 @@ function unescapeCharactersInQuotes(permutations){
           decoded = decoded.replace(/&#41;/g, ')');
           // restore spaces that may have been encoded
           decoded = decodeURI(decoded);
-          // strip leading NOT for termSet
-          var searchTerm = decoded;
          
 					// strip off quotes 
   			  decoded = decoded.replace(/^"(.*)"$/, function(match, group1, offset, original){ 
 						return group1; 
 					});
           decodedElement.push(decoded);
-          termSet.add(searchTerm);
       });
       decodedPermutations.push(decodedElement);
   });
