@@ -125,6 +125,25 @@ describe('String functions', function() {
       assert.deepEqual([['a'],['"b'],['c']], bparser.unescapeCharactersInQuotes([['a'],['"b'],['c']]));
     });
   });
+
+  describe('injectOperatorBetweenTerms()', function() {
+    it('should add in additional ANDs to the searchPhrase by default', function() {
+      assert.equal('a AND b', bparser.injectOperatorBetweenTerms('a b'));
+      assert.equal('a AND b', bparser.injectOperatorBetweenTerms('a AND b'));
+      assert.equal('a OR b', bparser.injectOperatorBetweenTerms('a OR b'));
+    });
+
+    it('should add in ORs to the searchPhrase, if specified', function() {
+			// Save off the old split term and override it to 'OR'
+			var oldSplitTerm = bparser.defaultSplitTerm;
+			bparser.defaultSplitTerm = 'OR';
+      assert.equal('a OR b', bparser.injectOperatorBetweenTerms('a b'));
+      assert.equal('a AND b', bparser.injectOperatorBetweenTerms('a AND b'));
+      assert.equal('a OR b', bparser.injectOperatorBetweenTerms('a OR b'));
+			// Restore the old split term
+			bparser.defaultSplitTerm = oldSplitTerm;
+    });
+  });
 });
 
 describe('query merging functions', function() {
@@ -212,6 +231,11 @@ describe('query merging functions', function() {
 });
 
 describe('parse function', function() {
+  it('Should parse a simple query without an operator', function() {
+    assert.deepEqual([['a', 'b']], bparser.parseBooleanQuery('a b'));
+    assert.deepEqual([['a', 'b','c']], bparser.parseBooleanQuery('a AND b c'));
+    assert.deepEqual([['a','b c']], bparser.parseBooleanQuery('a "b c"'));
+  });
   it('Should parse a simple query without any brackets', function() {
     assert.deepEqual([['a', 'b']], bparser.parseBooleanQuery('a AND b'));
     assert.deepEqual([['a'], ['b']], bparser.parseBooleanQuery('a OR b'));

@@ -35,6 +35,29 @@ function parseBooleanQuery(searchPhrase) {
 	return permutations;
 }
 
+//var defaultSplitTerm = 'AND';
+
+function injectOperatorBetweenTerms(searchPhrase) {
+  // Default to using AND
+	useAnd = (module.exports.defaultSplitTerm == 'AND');
+
+  // Remove leading and trailing whitespace
+	searchPhrase = searchPhrase.trim();
+
+	if(useAnd){
+		// replace all spaces with ' AND ', then remove any extra ANDs
+    searchPhrase = searchPhrase.replace(/ /gi, ' AND ');
+    searchPhrase = searchPhrase.replace(/ AND AND AND /gi, ' AND ');
+    searchPhrase = searchPhrase.replace(/ AND OR AND /gi, ' OR ');
+	} else {
+		// replace all spaces with ' OR ', then remove any extra ORs
+    searchPhrase = searchPhrase.replace(/ /gi, ' OR ');
+    searchPhrase = searchPhrase.replace(/ OR AND OR /gi, ' AND ');
+    searchPhrase = searchPhrase.replace(/ OR OR OR /gi, ' OR ');
+	}
+	return searchPhrase;
+}
+
 function escapeCharactersInQuotes(searchPhrase){
   searchPhrase = searchPhrase.replace(/(".+?")/g, function(match, group1, offset, input_string) {
      // remove spaces
@@ -87,6 +110,9 @@ function _parseBooleanQuery(searchPhrase) {
 
   // remove double whitespaces
   searchPhrase = removeDoubleWhiteSpace(searchPhrase);
+
+	// Put ANDs inbetween all the terms that only have a space betwee them
+	searchPhrase = injectOperatorBetweenTerms(searchPhrase);
 
   // Split the phrase on the term 'OR', but don't do this on 'OR' that's in
   // between brackets. EX: a OR (b OR c) should not parse the `OR` in between b
@@ -350,5 +376,7 @@ module.exports = {
   parseBooleanQuery: parseBooleanQuery,
   containsBrackets: containsBrackets,
   escapeCharactersInQuotes: escapeCharactersInQuotes,
-  unescapeCharactersInQuotes: unescapeCharactersInQuotes
+  unescapeCharactersInQuotes: unescapeCharactersInQuotes,
+  injectOperatorBetweenTerms: injectOperatorBetweenTerms,
+	defaultSplitTerm: 'AND'
 };
