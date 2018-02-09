@@ -24,6 +24,56 @@ function _arraysAreEqual(arrA, arrB) {
   return true;
 }
 
+function parseBooleanQuery(searchPhrase) {
+
+	searchPhrase = escapeCharactersInQuotes(searchPhrase);
+
+	var permutations = _parseBooleanQuery(searchPhrase);
+
+	permutations = unescapeCharactersInQuotes(permutations);
+
+	return permutations;
+}
+
+function escapeCharactersInQuotes(searchPhrase){
+  searchPhrase = searchPhrase.replace(/(".+?")/g, function(match, group1, offset, input_string) {
+     // remove spaces
+     var encoded = encodeURI(group1.trim());
+     // remove parenthesis
+     encoded = encoded.replace(/\(/g, '&#40;');
+     encoded = encoded.replace(/\)/g, '&#41;');
+     return encoded;
+  });
+	return searchPhrase;
+}
+
+function unescapeCharactersInQuotes(permutations){
+  var decodedPermutations = [];
+  var termSet = new Set();
+
+  permutations.forEach(function(element){
+      var decodedElement = [];
+      element.forEach(function(term){
+          // restore parenthesis that may have been encoded
+          var decoded = term.replace(/&#40;/g, '(');
+          decoded = decoded.replace(/&#41;/g, ')');
+          // restore spaces that may have been encoded
+          decoded = decodeURI(decoded);
+          // strip leading NOT for termSet
+          var searchTerm = decoded;
+         
+					// strip off quotes 
+  			  decoded = decoded.replace(/^"(.*)"$/, function(match, group1, offset, original){ 
+						return group1; 
+					});
+          decodedElement.push(decoded);
+          termSet.add(searchTerm);
+      });
+      decodedPermutations.push(decodedElement);
+  });
+	return decodedPermutations;
+}
+
 // This function converts a boolean query to a 2 dimensional array.
 // a AND (b OR c)
 // Becomes:
@@ -34,7 +84,7 @@ function _arraysAreEqual(arrA, arrB) {
 // There are more efficient ways to match content to this query, though this is
 // the one that is most easy to maintain and limits risk of side-effects.
 // Especially when considering recursively nested queries.
-function parseBooleanQuery(searchPhrase) {
+function _parseBooleanQuery(searchPhrase) {
 
   // Remove outer brackets if they exist. EX: (a OR b) -> a OR b
   searchPhrase = removeOuterBrackets(searchPhrase);
@@ -68,7 +118,7 @@ function parseBooleanQuery(searchPhrase) {
       // If the string contains brackets, parse it recursively, and add it to
       // `nestedPaths`.
       if (containsBrackets(ands[i])) {
-        nestedPaths.push(parseBooleanQuery(ands[i]));
+        nestedPaths.push(_parseBooleanQuery(ands[i]));
       }
 
       // If it doesn't. Push the word to `andPath`.
@@ -302,5 +352,7 @@ module.exports = {
   removeDoubleWhiteSpace: removeDoubleWhiteSpace,
   removeOuterBrackets: removeOuterBrackets,
   parseBooleanQuery: parseBooleanQuery,
-  containsBrackets: containsBrackets
+  containsBrackets: containsBrackets,
+  escapeCharactersInQuotes: escapeCharactersInQuotes,
+  unescapeCharactersInQuotes: unescapeCharactersInQuotes
 };

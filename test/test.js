@@ -89,7 +89,42 @@ describe('String functions', function() {
       assert.equal('a b c', bparser.removeDoubleWhiteSpace("a\nb\tc"));
     });
   });
+  
+	describe('escapeCharactersInQuotes', function() {
+    it('Should modify inside quotes to have no spaces', function() {
+      assert.equal('a %22b%20c%22', bparser.escapeCharactersInQuotes('a "b c"'));
+    });
 
+    it('Should modify inside quotes to have no parenthesis', function() {
+      assert.equal('a %22&#40;b-c&#41;%22', bparser.escapeCharactersInQuotes('a "(b-c)"'));
+    });
+
+    it('Should modify multiple sets of quotes', function() {
+      assert.equal('a %22b%20c%22 d %22e%20f%22 g', bparser.escapeCharactersInQuotes('a "b c" d "e f" g'));
+    });
+    
+		it('Should ignore dangling quotes', function() {
+      assert.equal('a "b c', bparser.escapeCharactersInQuotes('a "b c'));
+    });
+  });
+
+	describe('unescapeCharactersInQuotes', function() {
+    it('Should restore spaces in terms', function() {
+      assert.deepEqual([['a'],['b c']], bparser.unescapeCharactersInQuotes([['a'],['%22b%20c%22']]));
+    });
+
+    it('Should restore parenthesis in terms', function() {
+      assert.deepEqual([['a'],['(b-c)']], bparser.unescapeCharactersInQuotes([['a'],['%22&#40;b-c&#41;%22']]));
+    });
+
+    it('Should restore multiple sets of quotes', function() {
+      assert.deepEqual([['a'],['b c'],['d'],['e f'],['g']], bparser.unescapeCharactersInQuotes([['a'],['%22b%20c%22'],['d'],['%22e%20f%22'],['g']]));
+    });
+    
+		it('Should ignore dangling quotes', function() {
+      assert.deepEqual([['a'],['"b'],['c']], bparser.unescapeCharactersInQuotes([['a'],['"b'],['c']]));
+    });
+  });
 });
 
 describe('query merging functions', function() {
@@ -189,6 +224,12 @@ describe('parse function', function() {
   it('Should parse a simple query a single depth of brackets', function() {
     assert.deepEqual([['a', 'c'], ['b', 'c']], bparser.parseBooleanQuery('(a OR b) AND c'));
   });
+  it('Should parse a simple query a query with quoted terms', function() {
+    assert.deepEqual([['a', 'c'], ['b', 'c']], bparser.parseBooleanQuery('("a" OR b) AND c'));
+  });
+  it('Should parse a more complex query a query with quoted terms', function() {
+    assert.deepEqual([['a b', 'e f'], ['c', 'e f']], bparser.parseBooleanQuery('("a b" OR c) AND "e f"'));
+  });
 
   // This resolves to issue #3 on github
   it('Should parse a query, where the final bracket is not related to the first bracket', function() {
@@ -216,6 +257,20 @@ describe('parse function', function() {
        ['a','c','d','e','f'],
        ['a','c','d','e','g'],
        ['a','c','d','e','h'],
+       ['i'],['j']]),
+      recursiveSort(bparser.parseBooleanQuery(searchPhrase))
+    );
+  });
+  it('..long shot with quotes', function(){
+    var searchPhrase = '(("a " AND ("(b" OR "c)")) AND ("d AND" AND "e OR") AND ("(f)" OR g OR h)) OR i OR j';
+    assert.deepEqual(
+      recursiveSort(
+      [['a ','(b','d AND','e OR','(f)'],
+       ['a ','(b','d AND','e OR','g'],
+       ['a ','(b','d AND','e OR','h'],
+       ['a ','c)','d AND','e OR','(f)'],
+       ['a ','c)','d AND','e OR','g'],
+       ['a ','c)','d AND','e OR','h'],
        ['i'],['j']]),
       recursiveSort(bparser.parseBooleanQuery(searchPhrase))
     );

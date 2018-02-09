@@ -9,13 +9,16 @@ This function converts a boolean query to a 2 dimensional array with all possibi
 Input                         | Output
 --------                      | ---------
 `a AND b`                     | `[[a, b]]`
+`a AND b`                     | `[[a, b]]`
 `a OR  b`                     | `[[a], [b]]`
 `a AND b AND c`               | `[[a, b, c]]`
 `a AND b OR  c`               | `[[a, b], [c]]`
 `a AND (b OR c)`              | `[[a, b], [a, c]]`
 `a AND (b OR c) AND (d OR e)` | `[[a, b, d], [a, b, e], [a, c, d], [a, c, e]]`
 
-Whereas `a`, `b` and `c` represent words, forming a complex query pattern.
+Whereas `a`, `b` and `c` represent terms, forming a complex query pattern.
+
+A term can be written as a single word, or a phrase can be represented by using double quotes to wrap multiple words (e.g. term `a` could be `"foo bar"`).
 
 This function works recursively trough all brackets and generates an array of all possible combinations
 of a matching query.
