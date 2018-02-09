@@ -24,6 +24,79 @@ function _arraysAreEqual(arrA, arrB) {
   return true;
 }
 
+function parseBooleanQuery(searchPhrase) {
+
+	searchPhrase = escapeCharactersInQuotes(searchPhrase);
+
+	var permutations = _parseBooleanQuery(searchPhrase);
+
+	permutations = unescapeCharactersInQuotes(permutations);
+
+	return permutations;
+}
+
+//var defaultSplitTerm = 'AND';
+
+function injectOperatorBetweenTerms(searchPhrase) {
+  // Default to using AND
+	useAnd = (module.exports.defaultSplitTerm == 'AND');
+
+  // Remove leading and trailing whitespace
+	searchPhrase = searchPhrase.trim();
+
+	if(useAnd){
+		// replace all spaces with ' AND ', then remove any extra ANDs
+    searchPhrase = searchPhrase.replace(/ /gi, ' AND ');
+    searchPhrase = searchPhrase.replace(/ AND AND AND /gi, ' AND ');
+    searchPhrase = searchPhrase.replace(/ AND OR AND /gi, ' OR ');
+    searchPhrase = searchPhrase.replace(/\( AND /gi, '(');
+    searchPhrase = searchPhrase.replace(/ AND \)/gi, ')');
+	} else {
+		// replace all spaces with ' OR ', then remove any extra ORs
+    searchPhrase = searchPhrase.replace(/ /gi, ' OR ');
+    searchPhrase = searchPhrase.replace(/ OR AND OR /gi, ' AND ');
+    searchPhrase = searchPhrase.replace(/ OR OR OR /gi, ' OR ');
+    searchPhrase = searchPhrase.replace(/\( OR /gi, '(');
+    searchPhrase = searchPhrase.replace(/ OR \)/gi, ')');
+	}
+	return searchPhrase;
+}
+
+function escapeCharactersInQuotes(searchPhrase){
+  searchPhrase = searchPhrase.replace(/(".+?")/g, function(match, group1, offset, input_string) {
+     // remove spaces
+     var encoded = encodeURI(group1.trim());
+     // remove parenthesis
+     encoded = encoded.replace(/\(/g, '&#40;');
+     encoded = encoded.replace(/\)/g, '&#41;');
+     return encoded;
+  });
+	return searchPhrase;
+}
+
+function unescapeCharactersInQuotes(permutations){
+  var decodedPermutations = [];
+
+  permutations.forEach(function(element){
+      var decodedElement = [];
+      element.forEach(function(term){
+          // restore parenthesis that may have been encoded
+          var decoded = term.replace(/&#40;/g, '(');
+          decoded = decoded.replace(/&#41;/g, ')');
+          // restore spaces that may have been encoded
+          decoded = decodeURI(decoded);
+         
+					// strip off quotes 
+  			  decoded = decoded.replace(/^"(.*)"$/, function(match, group1, offset, original){ 
+						return group1; 
+					});
+          decodedElement.push(decoded);
+      });
+      decodedPermutations.push(decodedElement);
+  });
+	return decodedPermutations;
+}
+
 // This function converts a boolean query to a 2 dimensional array.
 // a AND (b OR c)
 // Becomes:
@@ -34,13 +107,16 @@ function _arraysAreEqual(arrA, arrB) {
 // There are more efficient ways to match content to this query, though this is
 // the one that is most easy to maintain and limits risk of side-effects.
 // Especially when considering recursively nested queries.
-function parseBooleanQuery(searchPhrase) {
+function _parseBooleanQuery(searchPhrase) {
 
   // Remove outer brackets if they exist. EX: (a OR b) -> a OR b
   searchPhrase = removeOuterBrackets(searchPhrase);
 
   // remove double whitespaces
   searchPhrase = removeDoubleWhiteSpace(searchPhrase);
+
+	// Put ANDs inbetween all the terms that only have a space betwee them
+	searchPhrase = injectOperatorBetweenTerms(searchPhrase);
 
   // Split the phrase on the term 'OR', but don't do this on 'OR' that's in
   // between brackets. EX: a OR (b OR c) should not parse the `OR` in between b
@@ -68,7 +144,7 @@ function parseBooleanQuery(searchPhrase) {
       // If the string contains brackets, parse it recursively, and add it to
       // `nestedPaths`.
       if (containsBrackets(ands[i])) {
-        nestedPaths.push(parseBooleanQuery(ands[i]));
+        nestedPaths.push(_parseBooleanQuery(ands[i]));
       }
 
       // If it doesn't. Push the word to `andPath`.
@@ -302,5 +378,9 @@ module.exports = {
   removeDoubleWhiteSpace: removeDoubleWhiteSpace,
   removeOuterBrackets: removeOuterBrackets,
   parseBooleanQuery: parseBooleanQuery,
-  containsBrackets: containsBrackets
+  containsBrackets: containsBrackets,
+  escapeCharactersInQuotes: escapeCharactersInQuotes,
+  unescapeCharactersInQuotes: unescapeCharactersInQuotes,
+  injectOperatorBetweenTerms: injectOperatorBetweenTerms,
+	defaultSplitTerm: 'AND'
 };
